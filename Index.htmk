@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bummy Editor</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#080808;
+  color:white;
+  min-height:100vh;
+}
+
+/* HEADER */
+header{
+  height:65px;
+  background:#111;
+  border-bottom:1px solid #292929;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 20px;
+}
+
+.logo{
+  font-size:23px;
+  font-weight:bold;
+}
+
+.logo span{
+  color:#00eaff;
+}
+
+.header-buttons{
+  display:flex;
+  gap:8px;
+}
+
+.header-buttons button{
+  background:#1c1c1c;
+  color:white;
+  border:1px solid #333;
+  padding:9px 13px;
+  border-radius:7px;
+}
+
+/* LAYOUT */
+.container{
+  display:grid;
+  grid-template-columns:210px 1fr 240px;
+  min-height:calc(100vh - 65px);
+}
+
+/* LEFT */
+.left{
+  background:#101010;
+  border-right:1px solid #292929;
+  padding:15px;
+}
+
+.left h3{
+  margin-bottom:15px;
+}
+
+.tool{
+  width:100%;
+  padding:13px;
+  margin-bottom:9px;
+  border:1px solid #292929;
+  background:#181818;
+  color:white;
+  border-radius:8px;
+  text-align:left;
+  cursor:pointer;
+}
+
+.tool:hover{
+  background:#00eaff;
+  color:#000;
+}
+
+/* CENTER */
+.editor{
+  padding:20px;
+}
+
+.video-box{
+  min-height:400px;
+  background:#000;
+  border:1px solid #292929;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+#video{
+  width:100%;
+  max-height:500px;
+  display:none;
+}
+
+.empty{
+  text-align:center;
+  color:#777;
+}
+
+.empty h2{
+  color:#aaa;
+  margin-bottom:8px;
+}
+
+.upload{
+  display:inline-block;
+  margin-top:18px;
+  background:#00eaff;
+  color:#000;
+  padding:12px 20px;
+  border-radius:8px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+#fileInput{
+  display:none;
+}
+
+/* CONTROLS */
+.controls{
+  margin-top:15px;
+  padding:15px;
+  background:#111;
+  border:1px solid #292929;
+  border-radius:10px;
+}
+
+#progress{
+  width:100%;
+  margin-bottom:13px;
+}
+
+.control-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.control-row button{
+  background:#1c1c1c;
+  color:white;
+  border:1px solid #333;
+  padding:9px 12px;
+  border-radius:7px;
+  cursor:pointer;
+}
+
+.control-row button:hover{
+  background:#00eaff;
+  color:#000;
+}
+
+#volume{
+  width:90px;
+}
+
+/* TIMELINE */
+.timeline{
+  margin-top:15px;
+  padding:15px;
+  height:120px;
+  background:#111;
+  border:1px solid #292929;
+  border-radius:10px;
+}
+
+.timeline h3{
+  margin-bottom:13px;
+}
+
+.track{
+  height:45px;
+  background:#202020;
+  border-radius:7px;
+  position:relative;
+}
+
+.clip{
+  position:absolute;
+  left:8px;
+  top:6px;
+  width:45%;
+  height:33px;
+  background:#00eaff;
+  border-radius:5px;
+}
+
+/* RIGHT */
+.right{
+  background:#101010;
+  border-left:1px solid #292929;
+  padding:18px;
+}
+
+.right h3{
+  margin-bottom:20px;
+}
+
+.setting{
+  margin-bottom:18px;
+}
+
+.setting label{
+  display:block;
+  color:#aaa;
+  margin-bottom:7px;
+}
+
+.setting select{
+  width:100%;
+  padding:10px;
+  background:#191919;
+  color:white;
+  border:1px solid #333;
+  border-radius:7px;
+}
+
+.export{
+  width:100%;
+  padding:13px;
+  border:none;
+  border-radius:8px;
+  background:#00eaff;
+  color:#000;
+  font-weight:bold;
+  font-size:16px;
+  cursor:pointer;
+}
+
+/* MOBILE */
+@media(max-width:850px){
+
+  .container{
+    grid-template-columns:1fr;
+  }
+
+  .left{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    border-right:none;
+    border-bottom:1px solid #292929;
+    padding:10px;
+  }
+
+  .left h3{
+    display:none;
+  }
+
+  .tool{
+    min-width:120px;
+    margin:0;
+  }
+
+  .right{
+    border-left:none;
+    border-top:1px solid #292929;
+  }
+
+  .editor{
+    padding:10px;
+  }
+
+  .video-box{
+    min-height:250px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+  <div class="logo">
+    Bummy<span>Editor</span>
+  </div>
+
+  <div class="header-buttons">
+    <button onclick="newProject()">New</button>
+    <button onclick="saveProject()">Save</button>
+  </div>
+
+</header>
+
+
+<div class="container">
+
+  <!-- LEFT TOOLS -->
+  <aside class="left">
+
+    <h3>Tools</h3>
+
+    <button class="tool" onclick="chooseVideo()">
+      📁 Import Video
+    </button>
+
+    <button class="tool" onclick="textTool()">
+      🔤 Text
+    </button>
+
+    <button class="tool" onclick="musicTool()">
+      🎵 Music
+    </button>
+
+    <button class="tool" onclick="filterTool()">
+      🎨 Filters
+    </button>
+
+    <button class="tool" onclick="transitionTool()">
+      ✨ Transition
+    </button>
+
+    <button class="tool" onclick="cropTool()">
+      ✂️ Crop
+    </button>
+
+    <button class="tool" onclick="speedTool()">
+      ⚡ Speed
+    </button>
+
+  </aside>
+
+
+  <!-- MAIN EDITOR -->
+  <main class="editor">
+
+    <div class="video-box">
+
+      <div class="empty" id="empty">
+
+        <h2>🎬 Your Video</h2>
+
+        <p>Upload a video to start editing</p>
+
+        <label class="upload" for="fileInput">
+          Upload Video
+        </label>
+
+      </div>
+
+      <video id="video" controls></video>
+
+    </div>
+
+
+    <input
+      type="file"
+      id="fileInput"
+      accept="video/*"
+    >
+
+
+    <!-- CONTROLS -->
+    <div class="controls">
+
+      <input
+        id="progress"
+        type="range"
+        min="0"
+        max="100"
+        value="0"
+      >
+
+      <div class="control-row">
+
+        <button onclick="togglePlay()" id="playBtn">
+          ▶ Play
+        </button>
+
+        <button onclick="restartVideo()">
+          🔄
+        </button>
+
+        <button onclick="muteVideo()" id="muteBtn">
+          🔊
+        </button>
+
+        <input
+          id="volume"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value="1"
+        >
+
+        <button onclick="fullscreenVideo()">
+          ⛶
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- TIMELINE -->
+    <div class="timeline">
+
+      <h3>Timeline</h3>
+
+      <div class="track">
+        <div class="clip"></div>
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <!-- RIGHT SETTINGS -->
+  <aside class="right">
+
+    <h3>Export Settings</h3>
+
+    <div class="setting">
+
+      <label>Resolution</label>
+
+      <select id="resolution">
+
+        <option value="1080p">1080p</option>
+        <option value="720p">720p</option>
+        <option value="480p">480p</option>
+
+      </select>
+
+    </div>
+
+
+    <div class="setting">
+
+      <label>Format</label>
+
+      <select id="format">
+
+        <option value="MP4">MP4</option>
+        <option value="WebM">WebM</option>
+
+      </select>
+
+    </div>
+
+
+    <div class="setting">
+
+      <label>Quality</label>
+
+      <select id="quality">
+
+        <option>High</option>
+        <option>Medium</option>
+        <option>Low</option>
+
+      </select>
+
+    </div>
+
+
+    <button class="export" onclick="exportVideo()">
+      ⬇ Export Video
+    </button>
+
+  </aside>
+
+</div>
+
+
+<script>
+
+const fileInput =
+  document.getElementById("fileInput");
+
+const video =
+  document.getElementById("video");
+
+const empty =
+  document.getElementById("empty");
+
+const progress =
+  document.getElementById("progress");
+
+const volume =
+  document.getElementById("volume");
+
+const playBtn =
+  document.getElementById("playBtn");
+
+const muteBtn =
+  document.getElementById("muteBtn");
+
+let videoURL = null;
+
+
+/* IMPORT VIDEO */
+
+fileInput.addEventListener("change", function(){
+
+  const file = this.files[0];
+
+  if(!file){
+    return;
+  }
+
+  if(!file.type.startsWith("video/")){
+    alert("Please select a video.");
+    return;
+  }
+
+  if(videoURL){
+    URL.revokeObjectURL(videoURL);
+  }
+
+  videoURL = URL.createObjectURL(file);
+
+  video.src = videoURL;
+
+  video.style.display = "block";
+
+  empty.style.display = "none";
+
+  video.load();
+
+});
+
+
+/* CHOOSE VIDEO */
+
+function chooseVideo(){
+
+  fileInput.click();
+
+}
+
+
+/* PLAY */
+
+function togglePlay(){
+
+  if(!video.src){
+
+    alert("First upload a video.");
+
+    return;
+
+  }
+
+  if(video.paused){
+
+    video.play();
+
+    playBtn.innerHTML = "⏸ Pause";
+
+  }else{
+
+    video.pause();
+
+    playBtn.innerHTML = "▶ Play";
+
+  }
+
+}
+
+
+/* WHEN VIDEO ENDS */
+
+video.addEventListener("ended", function(){
+
+  playBtn.innerHTML = "▶ Play";
+
+});
+
+
+/* PROGRESS */
+
+video.addEventListener("timeupdate", function(){
+
+  if(video.duration){
+
+    progress.value =
+      (video.currentTime /
+       video.duration) * 100;
+
+  }
+
+});
+
+
+progress.addEventListener("input", function(){
+
+  if(video.duration){
+
+    video.currentTime =
+      (progress.value / 100) *
+      video.duration;
+
+  }
+
+});
+
+
+/* VOLUME */
+
+volume.addEventListener("input", function(){
+
+  video.volume = volume.value;
+
+});
+
+
+/* MUTE */
+
+function muteVideo(){
+
+  video.muted = !video.muted;
+
+  if(video.muted){
+
+    muteBtn.innerHTML = "🔇";
+
+  }else{
+
+    muteBtn.innerHTML = "🔊";
+
+  }
+
+}
+
+
+/* RESTART */
+
+function restartVideo(){
+
+  if(!video.src){
+
+    alert("First upload a video.");
+
+    return;
+
+  }
+
+  video.currentTime = 0;
+
+  video.play();
+
+  playBtn.innerHTML = "⏸ Pause";
+
+}
+
+
+/* FULLSCREEN */
+
+function fullscreenVideo(){
+
+  if(!video.src){
+
+    alert("First upload a video.");
+
+    return;
+
+  }
+
+  if(video.requestFullscreen){
+
+    video.requestFullscreen();
+
+  }
+
+}
+
+
+/* NEW PROJECT */
+
+function newProject(){
+
+  video.pause();
+
+  video.removeAttribute("src");
+
+  video.load();
+
+  video.style.display = "none";
+
+  empty.style.display = "block";
+
+  fileInput.value = "";
+
+  progress.value = 0;
+
+  playBtn.innerHTML = "▶ Play";
+
+}
+
+
+/* SAVE PROJECT */
+
+function saveProject(){
+
+  const project = {
+
+    resolution:
+      document.getElementById("resolution").value,
+
+    format:
+      document.getElementById("format").value,
+
+    quality:
+      document.getElementById("quality").value
+
+  };
+
+  localStorage.setItem(
+    "bummyEditorProject",
+    JSON.stringify(project)
+  );
+
+  alert("Project settings saved!");
+
+}
+
+
+/* EXPORT */
+
+function exportVideo(){
+
+  if(!video.src){
+
+    alert("First upload a video.");
+
+    return;
+
+  }
+
+  const format =
+    document.getElementById("format").value;
+
+  const link =
+    document.createElement("a");
+
+  link.href = video.src;
+
+  link.download =
+    "Bummy-Editor-Video." +
+    (format === "WebM" ? "webm" : "mp4");
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+
+}
+
+
+/* TOOLS */
+
+function textTool(){
+
+  alert("Text tool selected!");
+
+}
+
+function musicTool(){
+
+  alert("Music tool selected!");
+
+}
+
+function filterTool(){
+
+  alert("Filter tool selected!");
+
+}
+
+function transitionTool(){
+
+  alert("Transition tool selected!");
+
+}
+
+function cropTool(){
+
+  alert("Crop tool selected!");
+
+}
+
+function speedTool(){
+
+  alert("Speed tool selected!");
+
+}
+
+</script>
+
+</body>
+  </html>
